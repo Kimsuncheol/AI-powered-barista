@@ -38,3 +38,14 @@ export async function clearCart() {
     method: "POST",
   });
 }
+
+export async function addCartItem(payload: {
+  itemId: string;
+  quantity: number;
+  options?: Record<string, unknown>;
+}) {
+  return apiFetch<CartResponse>("/cart/items", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}

@@ -1,6 +1,4 @@
 "use client";
-
-import dynamic from "next/dynamic";
 import Link from "next/link";
 import {
   Box,
@@ -8,18 +6,16 @@ import {
   Typography,
   Button,
   Stack,
-  Grid,
   Paper,
 } from "@mui/material";
-import { useState } from "react";
 import RecommendationsSection from "@/components/recommendations/RecommendationsSection";
 import type { RecommendedItem } from "@/components/recommendations/types";
 import { mockUser } from "@/lib/mockUser";
-
-const AIChatPanel = dynamic(() => import("@/components/ai/AIChatPanel"), {
-  ssr: false,
-  loading: () => null,
-});
+import ChatbotTriggerButton from "@/components/chatbot/ChatbotTriggerButton";
+import ChatbotPanel from "@/components/chatbot/ChatbotPanel";
+import { useChatbot } from "@/hooks/useChatbot";
+import { useChatCoffeeActions } from "@/hooks/useChatCoffeeActions";
+import type { CoffeeCardData } from "@/types/chatbot";
 
 const recommendedMenu: RecommendedItem[] = [
   {
@@ -80,7 +76,41 @@ const menuCategories = [
 
 export default function Home() {
   const isSignedIn = mockUser.isSignedIn;
-  const [assistantOpen, setAssistantOpen] = useState(false);
+  const {
+    isOpen: chatbotOpen,
+    messages,
+    isLoading,
+    unreadCount,
+    openChat,
+    closeChat,
+    sendMessage,
+    appendSystemMessage,
+  } = useChatbot();
+  const { handleAddToCart, handlePayNow } = useChatCoffeeActions();
+
+  const handleChatAddToCart = async (item: CoffeeCardData, quantity: number) => {
+    try {
+      await handleAddToCart(item, quantity);
+      appendSystemMessage(`${item.name} (x${quantity}) added to your cart.`);
+    } catch (error) {
+      console.error("Failed to add to cart", error);
+      appendSystemMessage("Unable to add that drink to your cart right now.");
+    }
+  };
+
+  const handleChatPayNow = async (item: CoffeeCardData, quantity: number) => {
+    try {
+      const result = await handlePayNow(item, quantity);
+      appendSystemMessage(
+        `Your ${item.name} is confirmed. ${
+          result?.orderId ? `Order #${result.orderId}.` : "We will send tracking shortly."
+        }`
+      );
+    } catch (error) {
+      console.error("Pay Now failed", error);
+      appendSystemMessage("Payment didn't go through. Please try again or pay at the counter.");
+    }
+  };
 
   return (
     <Box component="main" sx={{ bgcolor: "background.default", color: "text.primary" }}>
@@ -111,44 +141,44 @@ export default function Home() {
             <Typography variant="h6" color="inherit">
               Tell us what you are craving and let our AI barista craft the perfect pour.
             </Typography>
-          <Stack
-            direction={{ xs: "column", sm: "row" }}
-            spacing={2}
-            sx={{ width: "100%" }}
-          >
-            <Link
-              href="/order"
-              style={{ textDecoration: "none", width: "fit-content" }}
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              spacing={2}
+              sx={{ width: "100%" }}
             >
+              <Link
+                href="/order"
+                style={{ textDecoration: "none", width: "fit-content" }}
+              >
+                <Button
+                  variant="contained"
+                  size="large"
+                  sx={{ whiteSpace: "nowrap" }}
+                >
+                  Order Now
+                </Button>
+              </Link>
+              <Link
+                href="/menu"
+                style={{ textDecoration: "none", width: "fit-content" }}
+              >
+                <Button
+                  variant="outlined"
+                  size="large"
+                  sx={{ whiteSpace: "nowrap" }}
+                >
+                  Explore Menu
+                </Button>
+              </Link>
               <Button
-                variant="contained"
+                variant="text"
                 size="large"
+                onClick={openChat}
                 sx={{ whiteSpace: "nowrap" }}
               >
-                Order Now
+                Chat with AI
               </Button>
-            </Link>
-            <Link
-              href="/menu"
-              style={{ textDecoration: "none", width: "fit-content" }}
-            >
-              <Button
-                variant="outlined"
-                size="large"
-                sx={{ whiteSpace: "nowrap" }}
-              >
-                Explore Menu
-              </Button>
-            </Link>
-            <Button
-              variant="text"
-              size="large"
-              onClick={() => setAssistantOpen(true)}
-              sx={{ whiteSpace: "nowrap" }}
-            >
-              Chat with AI
-            </Button>
-          </Stack>
+            </Stack>
           </Stack>
         </Container>
       </Box>
@@ -190,41 +220,49 @@ export default function Home() {
               Curated collections for every mood—from bold shots to gentle sips.
             </Typography>
           </Stack>
-              <Grid container spacing={3} sx={{ mt: 2 }}>
-                {menuCategories.map((category) => (
-                  <Grid item xs={12} sm={6} md={3} key={category.id}>
-                    <Link
-                      href={category.href}
-                      style={{ textDecoration: "none", display: "block" }}
-                    >
-                      <Paper
-                        elevation={1}
-                        sx={{
-                          p: 3,
-                          display: "flex",
-                          flexDirection: "column",
-                          gap: 1,
-                          height: "100%",
-                          borderRadius: 3,
-                          color: "inherit",
-                          transition: "border-color 0.2s ease, box-shadow 0.2s ease",
-                          "&:hover": {
-                            borderColor: "primary.main",
-                            boxShadow: 4,
-                          },
-                        }}
-                      >
-                        <Typography variant="h6" fontWeight={600}>
-                          {category.name}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {category.description}
-                        </Typography>
-                      </Paper>
-                    </Link>
-                  </Grid>
-                ))}
-              </Grid>
+          <Box
+            sx={{
+              mt: 2,
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(12rem, 1fr))",
+              gap: 3,
+            }}
+          >
+            {menuCategories.map((category) => (
+              <Link
+                key={category.id}
+                href={category.href}
+                style={{ textDecoration: "none", display: "block" }}
+              >
+                <Paper
+                  elevation={1}
+                  sx={{
+                    p: 3,
+                    aspectRatio: "1 / 1",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    gap: 1,
+                    borderRadius: 3,
+                    color: "inherit",
+                    transition: "border-color 0.2s ease, box-shadow 0.2s ease",
+                    "&:hover": {
+                      borderColor: "primary.main",
+                      boxShadow: 4,
+                    },
+                  }}
+                >
+                  <Typography variant="h6" fontWeight={600}>
+                    {category.name}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {category.description}
+                  </Typography>
+                </Paper>
+              </Link>
+            ))}
+          </Box>
         </Box>
 
         <Box
@@ -252,30 +290,41 @@ export default function Home() {
                 Our AI barista stays tuned to your preferences—customize your pour in seconds.
               </Typography>
             </Box>
-              <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
-                <Link
-                  href="/order"
-                  style={{ textDecoration: "none", width: "fit-content" }}
-                >
-                  <Button variant="contained" size="large">
-                    Order Now
-                  </Button>
-                </Link>
-                <Link
-                  href="/menu"
-                  style={{ textDecoration: "none", width: "fit-content" }}
-                >
-                  <Button variant="outlined" size="large">
-                    Explore Menu
-                  </Button>
-                </Link>
-              </Stack>
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+              <Link
+                href="/order"
+                style={{ textDecoration: "none", width: "fit-content" }}
+              >
+                <Button variant="contained" size="large">
+                  Order Now
+                </Button>
+              </Link>
+              <Link
+                href="/menu"
+                style={{ textDecoration: "none", width: "fit-content" }}
+              >
+                <Button variant="outlined" size="large">
+                  Explore Menu
+                </Button>
+              </Link>
+            </Stack>
           </Stack>
         </Box>
       </Container>
-      {assistantOpen && (
-        <AIChatPanel open={assistantOpen} onClose={() => setAssistantOpen(false)} />
-      )}
+      <ChatbotTriggerButton
+        isOpen={chatbotOpen}
+        unreadCount={unreadCount}
+        onClick={chatbotOpen ? closeChat : openChat}
+      />
+      <ChatbotPanel
+        isOpen={chatbotOpen}
+        onClose={closeChat}
+        messages={messages}
+        isLoading={isLoading}
+        onSendMessage={sendMessage}
+        onAddToCart={handleChatAddToCart}
+        onPayNow={handleChatPayNow}
+      />
     </Box>
   );
 }
