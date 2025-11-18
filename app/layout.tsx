@@ -3,7 +3,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import { AppearanceProvider } from "@/providers/AppearanceProvider";
+import { AuthProvider } from "@/providers/AuthProvider";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v14-appRouter";
+import ToastProvider from "@/components/notifications/ToastProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,8 +32,12 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <AppRouterCacheProvider options={{ key: "mui" }}>
           <AppearanceProvider>
-            <Header />
-            {children}
+            <AuthProvider>
+              <Header />
+              {children}
+              {/* TODO: gate ToastProvider with an env flag if we don't want to ship it in production. */}
+              <ToastProvider />
+            </AuthProvider>
           </AppearanceProvider>
         </AppRouterCacheProvider>
       </body>

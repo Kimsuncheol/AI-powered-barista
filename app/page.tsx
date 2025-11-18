@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import {
   Box,
@@ -8,9 +10,8 @@ import {
   Grid,
   Paper,
 } from "@mui/material";
-import RecommendedItems, {
-  type RecommendedItem,
-} from "@/components/home/RecommendedItems";
+import RecommendationsSection from "@/components/recommendations/RecommendationsSection";
+import type { RecommendedItem } from "@/components/recommendations/types";
 import { mockUser } from "@/lib/mockUser";
 
 const recommendedMenu: RecommendedItem[] = [
@@ -18,19 +19,28 @@ const recommendedMenu: RecommendedItem[] = [
     id: "cinnamon-espresso-craft",
     name: "Cinnamon Espresso Craft",
     description: "Espresso, toasted cinnamon, and steamed oat milk.",
-    price: "$5.50",
+    price: 5.5,
+    score: 0.91,
+    imageUrl:
+      "https://images.unsplash.com/photo-1510626176961-4b57c4d6c7b0?auto=format&fit=crop&w=900&q=80",
   },
   {
     id: "sunrise-cold-brew",
     name: "Sunrise Cold Brew",
     description: "Bright cold brew finished with citrus foam.",
-    price: "$4.75",
+    price: 4.75,
+    score: 0.87,
+    imageUrl:
+      "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=900&q=80",
   },
   {
     id: "vanilla-oat-flat-white",
     name: "Vanilla Oat Flat White",
     description: "Microfoam, single-origin beans, and vanilla syrup.",
-    price: "$5.25",
+    price: 5.25,
+    score: 0.89,
+    imageUrl:
+      "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=900&q=80",
   },
 ];
 
@@ -144,7 +154,14 @@ export default function Home() {
                 <Button variant="text">View full menu</Button>
               </Link>
             </Stack>
-            <RecommendedItems items={recommendedMenu} />
+            <RecommendationsSection
+              items={recommendedMenu}
+              context="home"
+              onAddToCart={(item) => {
+                console.info("Home recommendation add to cart (mock)", item.id);
+                // TODO: call `/ai/recommendations?context=home` and hook into the cart.
+              }}
+            />
           </Box>
         )}
 
