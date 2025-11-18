@@ -1,65 +1,245 @@
-import Image from "next/image";
+import Link from "next/link";
+import {
+  Box,
+  Container,
+  Typography,
+  Button,
+  Stack,
+  Grid,
+  Paper,
+} from "@mui/material";
+import RecommendedItems, {
+  type RecommendedItem,
+} from "@/components/home/RecommendedItems";
+import { mockUser } from "@/lib/mockUser";
+
+const recommendedMenu: RecommendedItem[] = [
+  {
+    id: "cinnamon-espresso-craft",
+    name: "Cinnamon Espresso Craft",
+    description: "Espresso, toasted cinnamon, and steamed oat milk.",
+    price: "$5.50",
+  },
+  {
+    id: "sunrise-cold-brew",
+    name: "Sunrise Cold Brew",
+    description: "Bright cold brew finished with citrus foam.",
+    price: "$4.75",
+  },
+  {
+    id: "vanilla-oat-flat-white",
+    name: "Vanilla Oat Flat White",
+    description: "Microfoam, single-origin beans, and vanilla syrup.",
+    price: "$5.25",
+  },
+];
+
+const menuCategories = [
+  {
+    id: "coffee",
+    name: "Coffee",
+    description: "House espressos, handcrafted lattes, and curated pour-overs.",
+    href: "/menu#coffee",
+  },
+  {
+    id: "tea",
+    name: "Tea",
+    description: "Botanical blends, matcha, and vibrant herbal infusions.",
+    href: "/menu#tea",
+  },
+  {
+    id: "non-coffee",
+    name: "Non-Coffee",
+    description: "Golden milk, cacao elixirs, and sparkling refreshments.",
+    href: "/menu#non-coffee",
+  },
+  {
+    id: "dessert",
+    name: "Dessert & Snacks",
+    description: "Baked goods, plant-based pastries, and snackable bites.",
+    href: "/menu#dessert",
+  },
+];
 
 export default function Home() {
+  const isSignedIn = mockUser.isSignedIn;
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <Box component="main" sx={{ bgcolor: "background.default", color: "text.primary" }}>
+      <Box
+        component="section"
+        sx={{
+          width: "100%",
+          bgcolor: "primary.main",
+          color: "primary.contrastText",
+          py: { xs: 8, md: 12 },
+        }}
+      >
+        <Container maxWidth="lg">
+          <Stack
+            spacing={3}
+            sx={{
+              textAlign: { xs: "center", md: "left" },
+              alignItems: { xs: "center", md: "flex-start" },
+              maxWidth: 640,
+              mx: "auto",
+              minHeight: { md: "55vh" },
+              justifyContent: "center",
+            }}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            <Typography variant="h2" component="h1" sx={{ fontWeight: 700 }}>
+              AI-Powered Barista
+            </Typography>
+            <Typography variant="h6" color="inherit">
+              Tell us what you are craving and let our AI barista craft the perfect pour.
+            </Typography>
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              spacing={2}
+              sx={{ width: "100%" }}
+            >
+              <Link
+                href="/order"
+                style={{ textDecoration: "none", width: "fit-content" }}
+              >
+                <Button
+                  variant="contained"
+                  size="large"
+                  sx={{ whiteSpace: "nowrap" }}
+                >
+                  Order Now
+                </Button>
+              </Link>
+              <Link
+                href="/menu"
+                style={{ textDecoration: "none", width: "fit-content" }}
+              >
+                <Button
+                  variant="outlined"
+                  size="large"
+                  sx={{ whiteSpace: "nowrap" }}
+                >
+                  Explore Menu
+                </Button>
+              </Link>
+            </Stack>
+          </Stack>
+        </Container>
+      </Box>
+
+      <Container maxWidth="lg" sx={{ py: 8, display: "flex", flexDirection: "column", gap: 8 }}>
+        {isSignedIn && (
+          <Box component="section">
+            <Stack
+              direction={{ xs: "column", md: "row" }}
+              alignItems="center"
+              justifyContent="space-between"
+              spacing={2}
+              sx={{ mb: 3 }}
+            >
+              <Typography variant="h5" fontWeight={600}>
+                Recommended for you
+              </Typography>
+              <Link href="/menu" style={{ textDecoration: "none" }}>
+                <Button variant="text">View full menu</Button>
+              </Link>
+            </Stack>
+            <RecommendedItems items={recommendedMenu} />
+          </Box>
+        )}
+
+        <Box component="section">
+          <Stack spacing={1}>
+            <Typography variant="h5" fontWeight={600}>
+              Menu Categories
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Curated collections for every mood—from bold shots to gentle sips.
+            </Typography>
+          </Stack>
+              <Grid container spacing={3} sx={{ mt: 2 }}>
+                {menuCategories.map((category) => (
+                  <Grid item xs={12} sm={6} md={3} key={category.id}>
+                    <Link
+                      href={category.href}
+                      style={{ textDecoration: "none", display: "block" }}
+                    >
+                      <Paper
+                        elevation={1}
+                        sx={{
+                          p: 3,
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: 1,
+                          height: "100%",
+                          borderRadius: 3,
+                          color: "inherit",
+                          transition: "border-color 0.2s ease, box-shadow 0.2s ease",
+                          "&:hover": {
+                            borderColor: "primary.main",
+                            boxShadow: 4,
+                          },
+                        }}
+                      >
+                        <Typography variant="h6" fontWeight={600}>
+                          {category.name}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {category.description}
+                        </Typography>
+                      </Paper>
+                    </Link>
+                  </Grid>
+                ))}
+              </Grid>
+        </Box>
+
+        <Box
+          component="section"
+          sx={{
+            py: 6,
+            px: { xs: 3, md: 5 },
+            borderRadius: 4,
+            border: 1,
+            borderColor: "divider",
+            bgcolor: "background.paper",
+          }}
+        >
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            alignItems="center"
+            justifyContent="space-between"
+            spacing={3}
           >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+            <Box>
+              <Typography variant="h6" fontWeight={600}>
+                Ready to order?
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Our AI barista stays tuned to your preferences—customize your pour in seconds.
+              </Typography>
+            </Box>
+              <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+                <Link
+                  href="/order"
+                  style={{ textDecoration: "none", width: "fit-content" }}
+                >
+                  <Button variant="contained" size="large">
+                    Order Now
+                  </Button>
+                </Link>
+                <Link
+                  href="/menu"
+                  style={{ textDecoration: "none", width: "fit-content" }}
+                >
+                  <Button variant="outlined" size="large">
+                    Explore Menu
+                  </Button>
+                </Link>
+              </Stack>
+          </Stack>
+        </Box>
+      </Container>
+    </Box>
   );
 }
