@@ -14,6 +14,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useAuth } from "@/hooks/useAuth";
+import { showError, showInfo } from "@/lib/toast";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -49,7 +50,9 @@ export default function LoginPage() {
       await login({ email, password });
       router.push("/profile");
     } catch {
-      setSubmissionError(error ?? "Unable to log in at the moment.");
+      const message = error ?? "Unable to log in at the moment.";
+      setSubmissionError(message);
+      showError(message);
     }
   };
 
@@ -58,8 +61,11 @@ export default function LoginPage() {
     try {
       await loginAsDev();
       router.push("/admin");
+      showInfo("Signed in as Dev Admin (mock).");
     } catch {
-      setSubmissionError("Unable to login as dev admin.");
+      const message = "Unable to login as dev admin.";
+      setSubmissionError(message);
+      showError(message);
     }
   };
 

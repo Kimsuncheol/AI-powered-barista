@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
 import type { User } from "@/types/auth";
+import { login as loginRequest, signup as signupRequest } from "@/lib/api/auth";
 
 type LoginPayload = {
   email: string;
@@ -44,15 +45,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setLoading(true);
     setError(null);
     try {
-      // TODO: replace with POST /auth/login and persist session/token.
-      await simulateDelay(800);
-      setUser({
-        id: "mock-user",
-        name: "Mock User",
-        email: payload.email,
-        phone: "010-1234-5678",
-        role: "ADMIN",
-      });
+      const user = await loginRequest(payload);
+      setUser(user);
+      // NOTE: JWT stays in HttpOnly cookie, backend handles persistence. DO NOT store tokens locally.
     } catch (err) {
       setError("Failed to log in. Please check your credentials.");
       throw err;
@@ -66,14 +61,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setError(null);
     try {
       // TODO: replace with POST /auth/signup and handle errors from backend.
-      await simulateDelay(900);
-      setUser({
-        id: "mock-user",
-        name: payload.name,
-        email: payload.email,
-        phone: payload.phone,
-        role: "CUSTOMER",
-      });
+      const user = await signupRequest(payload);
+      setUser(user);
     } catch (err) {
       setError("Failed to create account. Please try again.");
       throw err;

@@ -1,12 +1,12 @@
 "use client";
 
+import Image from "next/image";
 import {
   Box,
   Button,
   Card,
   CardActions,
   CardContent,
-  CardMedia,
   Divider,
   Stack,
   Typography,
@@ -44,18 +44,13 @@ export default function RecommendationCard({ item, onAddToCart }: Recommendation
           borderColor: "divider",
         }}
       >
-        <CardMedia
-          component="img"
-          image={item.imageUrl ?? placeholderImage}
+        <Image
+          src={item.imageUrl ?? placeholderImage}
           alt={item.name}
-          sx={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-          }}
+          fill
+          sizes="(max-width: 768px) 100vw, 320px"
+          style={{ objectFit: "cover" }}
+          loading="lazy"
         />
       </Box>
       <CardContent sx={{ flexGrow: 1 }}>

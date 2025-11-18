@@ -44,6 +44,8 @@ const quickReplies = [
   "Show my last order style",
 ];
 
+const DEFAULT_MESSAGES: ChatMessage[] = [];
+
 type AIChatPanelProps = {
   open: boolean;
   onClose: () => void;
@@ -155,7 +157,7 @@ export default function AIChatPanel({
   open,
   onClose,
   messages,
-  initialMessages = [],
+  initialMessages = DEFAULT_MESSAGES,
   onAddToCart,
   onModifyDrink,
   onSendMessage,
@@ -165,10 +167,14 @@ export default function AIChatPanel({
   const [isSending, setIsSending] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
   const isControlled = messages !== undefined;
+  const initialRef = useRef(initialMessages);
 
   useEffect(() => {
     if (isControlled) return;
-    setInternalMessages(initialMessages);
+    if (initialMessages !== initialRef.current) {
+      setInternalMessages(initialMessages);
+      initialRef.current = initialMessages;
+    }
   }, [initialMessages, isControlled]);
 
   const displayedMessages = messages ?? internalMessages;

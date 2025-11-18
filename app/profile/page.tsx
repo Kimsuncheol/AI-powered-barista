@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import {
   Alert,
   Box,
@@ -9,7 +10,6 @@ import {
   Card,
   CardActions,
   CardContent,
-  CardMedia,
   Chip,
   CircularProgress,
   Container,
@@ -235,12 +235,25 @@ export default function ProfilePage() {
                   <Grid item xs={12} sm={6} md={4} key={drink.id}>
                     <Card variant="outlined" sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
                       {drink.imageUrl && (
-                        <CardMedia
-                          component="img"
-                          height="150"
-                          image={drink.imageUrl}
-                          alt={drink.name}
-                        />
+                        <Box
+                          sx={{
+                            position: "relative",
+                            height: 150,
+                            width: "100%",
+                            overflow: "hidden",
+                            borderRadius: 1,
+                            mb: 1,
+                          }}
+                        >
+                          <Image
+                            src={drink.imageUrl}
+                            alt={drink.name}
+                            fill
+                            style={{ objectFit: "cover" }}
+                            sizes="(max-width: 600px) 100vw, 320px"
+                            loading="lazy"
+                          />
+                        </Box>
                       )}
                       <CardContent sx={{ flexGrow: 1 }}>
                         <Typography variant="subtitle1" fontWeight={600}>

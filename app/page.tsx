@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import {
   Box,
@@ -10,9 +11,15 @@ import {
   Grid,
   Paper,
 } from "@mui/material";
+import { useState } from "react";
 import RecommendationsSection from "@/components/recommendations/RecommendationsSection";
 import type { RecommendedItem } from "@/components/recommendations/types";
 import { mockUser } from "@/lib/mockUser";
+
+const AIChatPanel = dynamic(() => import("@/components/ai/AIChatPanel"), {
+  ssr: false,
+  loading: () => null,
+});
 
 const recommendedMenu: RecommendedItem[] = [
   {
@@ -73,6 +80,7 @@ const menuCategories = [
 
 export default function Home() {
   const isSignedIn = mockUser.isSignedIn;
+  const [assistantOpen, setAssistantOpen] = useState(false);
 
   return (
     <Box component="main" sx={{ bgcolor: "background.default", color: "text.primary" }}>
@@ -103,36 +111,44 @@ export default function Home() {
             <Typography variant="h6" color="inherit">
               Tell us what you are craving and let our AI barista craft the perfect pour.
             </Typography>
-            <Stack
-              direction={{ xs: "column", sm: "row" }}
-              spacing={2}
-              sx={{ width: "100%" }}
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            spacing={2}
+            sx={{ width: "100%" }}
+          >
+            <Link
+              href="/order"
+              style={{ textDecoration: "none", width: "fit-content" }}
             >
-              <Link
-                href="/order"
-                style={{ textDecoration: "none", width: "fit-content" }}
+              <Button
+                variant="contained"
+                size="large"
+                sx={{ whiteSpace: "nowrap" }}
               >
-                <Button
-                  variant="contained"
-                  size="large"
-                  sx={{ whiteSpace: "nowrap" }}
-                >
-                  Order Now
-                </Button>
-              </Link>
-              <Link
-                href="/menu"
-                style={{ textDecoration: "none", width: "fit-content" }}
+                Order Now
+              </Button>
+            </Link>
+            <Link
+              href="/menu"
+              style={{ textDecoration: "none", width: "fit-content" }}
+            >
+              <Button
+                variant="outlined"
+                size="large"
+                sx={{ whiteSpace: "nowrap" }}
               >
-                <Button
-                  variant="outlined"
-                  size="large"
-                  sx={{ whiteSpace: "nowrap" }}
-                >
-                  Explore Menu
-                </Button>
-              </Link>
-            </Stack>
+                Explore Menu
+              </Button>
+            </Link>
+            <Button
+              variant="text"
+              size="large"
+              onClick={() => setAssistantOpen(true)}
+              sx={{ whiteSpace: "nowrap" }}
+            >
+              Chat with AI
+            </Button>
+          </Stack>
           </Stack>
         </Container>
       </Box>
@@ -257,6 +273,9 @@ export default function Home() {
           </Stack>
         </Box>
       </Container>
+      {assistantOpen && (
+        <AIChatPanel open={assistantOpen} onClose={() => setAssistantOpen(false)} />
+      )}
     </Box>
   );
 }

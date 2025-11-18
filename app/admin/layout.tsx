@@ -73,10 +73,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         elevation={1}
         sx={{ width: `calc(100% - ${drawerWidth}px)`, ml: `${drawerWidth}px` }}
       >
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Admin Dashboard
-          </Typography>
+        <Toolbar  sx={{
+          px: { xs: 2, sm: 3 },
+          minHeight: 70,
+          display: "flex",
+          justifyContent: "space-between",
+          gap: 2,
+        }}>
+          <Link href="/" style={{ textDecoration: "none", color: "inherit" }}>
+            <Typography variant="h6" component="div"             sx={{ fontWeight: 700, letterSpacing: 0.5 }}
+            >
+              Admin Dashboard
+            </Typography>
+          </Link>
           <Button color="inherit" onClick={() => logout()}>
             Logout
           </Button>
