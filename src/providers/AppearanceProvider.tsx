@@ -30,6 +30,18 @@ const AppearanceContext = createContext<AppearanceContextValue | undefined>(
 
 const STORAGE_KEY = "appearance";
 
+const ssrMatchMedia = (query: string): MediaQueryList =>
+  ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    addListener: () => {},
+    removeListener: () => {},
+    dispatchEvent: () => false,
+  }) as MediaQueryList;
+
 const getAppearanceFromStorage = (): Appearance => {
   if (typeof window === "undefined") {
     return "system";
@@ -82,7 +94,7 @@ export const AppearanceProvider = ({ children }: { children: ReactNode }) => {
   );
 
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)", {
-    noSsr: true,
+    ssrMatchMedia,
   });
 
   const themeMode: ThemeMode =
@@ -94,7 +106,18 @@ export const AppearanceProvider = ({ children }: { children: ReactNode }) => {
       ? "dark"
       : "light";
 
-  const theme = useMemo<Theme>(() => createTheme({ palette: { mode: themeMode } }), [themeMode]);
+  const theme = useMemo<Theme>(
+    () =>
+      createTheme({
+        palette: { mode: themeMode },
+        components: {
+          MuiUseMediaQuery: {
+            defaultProps: { noSsr: true },
+          },
+        },
+      }),
+    [themeMode]
+  );
 
   const setAppearance = (next: Appearance) => {
     if (typeof window === "undefined") {
